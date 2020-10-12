@@ -37,6 +37,7 @@ class HorizontalCalendar extends StatefulWidget {
   final int minSelectedDateCount;
   final int maxSelectedDateCount;
   final bool isLabelUppercase;
+  final MainAxisAlignment mainAxisAlignment;
 
   HorizontalCalendar({
     Key key,
@@ -66,6 +67,7 @@ class HorizontalCalendar extends StatefulWidget {
     this.initialSelectedDates = const [],
     this.spacingBetweenDates = 8.0,
     this.padding = const EdgeInsets.all(8.0),
+    this.mainAxisAlignment = MainAxisAlignment.center,
     this.labelOrder = const [
       LabelType.month,
       LabelType.date,
@@ -116,6 +118,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
             return Row(
               children: <Widget>[
                 DateWidget(
+                  mainAxisAlignment: widget.mainAxisAlignment,
                   key: Key(date.toIso8601String()),
                   padding: widget.padding,
                   isSelected: selectedDates.contains(date),

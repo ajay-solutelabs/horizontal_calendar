@@ -27,6 +27,7 @@ class DateWidget extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final List<LabelType> labelOrder;
   final bool isLabelUppercase;
+  final MainAxisAlignment mainAxisAlignment;
 
   const DateWidget({
     Key key,
@@ -50,6 +51,7 @@ class DateWidget extends StatelessWidget {
     this.padding,
     this.labelOrder,
     this.isLabelUppercase = false,
+    this.mainAxisAlignment = MainAxisAlignment.center,
   }) : super(key: key);
 
   @override
@@ -73,11 +75,13 @@ class DateWidget extends StatelessWidget {
       child: Container(
         decoration: isSelected
             ? selectedDecoration
-            : isDisabled ? disabledDecoration : defaultDecoration,
+            : isDisabled
+                ? disabledDecoration
+                : defaultDecoration,
         child: Padding(
           padding: padding,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: mainAxisAlignment,
             children: <Widget>[
               ...labelOrder.map((type) {
                 Text text;
