@@ -3,6 +3,7 @@ library horizontal_calendar;
 import 'package:flutter/material.dart';
 import 'package:horizontal_calendar_widget/date_helper.dart';
 import 'package:horizontal_calendar_widget/date_widget.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 typedef DateBuilder = bool Function(DateTime dateTime);
 
@@ -30,7 +31,7 @@ class HorizontalCalendar extends StatefulWidget {
   final Decoration disabledDecoration;
   final DateBuilder isDateDisabled;
   final List<DateTime> initialSelectedDates;
-  final ScrollController scrollController;
+  final ItemScrollController scrollController;
   final double spacingBetweenDates;
   final EdgeInsetsGeometry padding;
   final List<LabelType> labelOrder;
@@ -38,6 +39,8 @@ class HorizontalCalendar extends StatefulWidget {
   final int maxSelectedDateCount;
   final bool isLabelUppercase;
   final MainAxisAlignment mainAxisAlignment;
+  final bool focusOnFirstSelectedDate;
+  final double focusAlignment;
 
   HorizontalCalendar({
     Key key,
@@ -74,6 +77,8 @@ class HorizontalCalendar extends StatefulWidget {
       LabelType.weekday,
     ],
     this.isLabelUppercase = false,
+    this.focusOnFirstSelectedDate = false,
+    this.focusAlignment = 0,
   })  : assert(firstDate != null),
         assert(lastDate != null),
         assert(
@@ -96,12 +101,30 @@ class HorizontalCalendar extends StatefulWidget {
 class _HorizontalCalendarState extends State<HorizontalCalendar> {
   final List<DateTime> allDates = [];
   final List<DateTime> selectedDates = [];
+  ItemScrollController _itemScrollController;
 
   @override
   void initState() {
     super.initState();
+    _itemScrollController ??= widget.scrollController ?? ItemScrollController();
     allDates.addAll(getDateList(widget.firstDate, widget.lastDate));
     selectedDates.addAll(widget.initialSelectedDates.map((toDateMonthYear)));
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (widget.focusOnFirstSelectedDate) {
+          if (selectedDates.isNotEmpty) {
+            final idx = allDates.indexOf(selectedDates.first);
+            if (idx >= 0) {
+              _itemScrollController.jumpTo(
+                index: idx,
+                alignment: widget.focusAlignment,
+              );
+            }
+          }
+        }
+      },
+    );
   }
 
   @override
@@ -109,8 +132,8 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     return Container(
       height: widget.height,
       child: Center(
-        child: ListView.builder(
-          controller: widget.scrollController ?? ScrollController(),
+        child: ScrollablePositionedList.builder(
+          itemScrollController: _itemScrollController,
           scrollDirection: Axis.horizontal,
           itemCount: allDates.length,
           itemBuilder: (context, index) {
